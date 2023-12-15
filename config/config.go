@@ -1,11 +1,10 @@
 package config
 
 import (
-    "encoding/json"
-    "fmt"
-    "github.com/spf13/viper"
-    "os"
-    "strconv"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strconv"
 )
 
 /*
@@ -18,73 +17,65 @@ import (
 // @param config config file path
 // @return err
 func FromFile(configPath string) (err error) {
-    // load configuration from file
-    viper.SetConfigFile(configPath)
-    if err = viper.ReadInConfig(); err != nil {
-        return
-    }
+	var (
+		fileContent []byte
+	)
 
-    // bind the configuration to the Config structure
-    if err = viper.Unmarshal(&configuration); err != nil {
-        return
-    }
-    return
+	fileContent, err = os.ReadFile(configPath)
+	if err != nil {
+		return
+	}
+
+	// bind the configuration to the Config structure
+	if err = json.Unmarshal(fileContent, &configuration); err != nil {
+		return
+	}
+	return
 }
 
 // FromEnv
 // @Description: read config from env
 // @return err
 func FromEnv() (err error) {
-    var (
-        emailPort int
-    )
+	var (
+		emailPort int
+	)
 
-    value, ok := os.LookupEnv(MessengerEmailPort)
-    if ok {
-        if emailPort, err = strconv.Atoi(value); err != nil {
-            err = fmt.Errorf("invalid email port: %s", value)
-            return
-        }
-    } else {
-        emailPort = 0
-    }
+	value, ok := os.LookupEnv(MessengerEmailPort)
+	if ok {
+		if emailPort, err = strconv.Atoi(value); err != nil {
+			err = fmt.Errorf("invalid email port: %s", value)
+			return
+		}
+	} else {
+		emailPort = 0
+	}
 
-    // bind the configuration to the Config structure
-    configuration = Config{
-        Email: struct {
-            Alias    string `json:"alias"`
-            Host     string `json:"host"`
-            Port     int    `json:"port"`
-            User     string `json:"user"`
-            Password string `json:"password"`
-        }{
-            Alias:    os.Getenv(MessengerEmailAlias),
-            Host:     os.Getenv(MessengerEmailHost),
-            Port:     emailPort,
-            User:     os.Getenv(MessengerEmailUser),
-            Password: os.Getenv(MessengerEmailPassword),
-        },
-        DingTalk: struct {
-            AgentID   string `json:"agent_id"`
-            AppKey    string `json:"app_key"`
-            AppSecret string `json:"app_secret"`
-        }{
-            AgentID:   os.Getenv(MessengerDingTalkAgentID),
-            AppKey:    os.Getenv(MessengerDingTalkAppKey),
-            AppSecret: os.Getenv(MessengerDingTalkAppSecret),
-        },
-        WeCom: struct {
-            AgentID   string `json:"agent_id"`
-            AppKey    string `json:"app_key"`
-            AppSecret string `json:"app_secret"`
-        }{
-            AgentID:   os.Getenv(MessengerWeComAgentID),
-            AppKey:    os.Getenv(MessengerWeComAppKey),
-            AppSecret: os.Getenv(MessengerWeComAppSecret),
-        },
-    }
+	// bind the configuration to the Config structure
+	configuration = Config{
+		Email: Email{
+			Alias:    os.Getenv(MessengerEmailAlias),
+			Host:     os.Getenv(MessengerEmailHost),
+			Port:     emailPort,
+			User:     os.Getenv(MessengerEmailUser),
+			Password: os.Getenv(MessengerEmailPassword),
+		},
+		DingTalk: DingTalk{
+			AgentID:   os.Getenv(MessengerDingTalkAgentID),
+			AppKey:    os.Getenv(MessengerDingTalkAppKey),
+			AppSecret: os.Getenv(MessengerDingTalkAppSecret),
+		},
+		WeCom: WeCom{
+			CorpId:     os.Getenv(MessengerWeComCorpId),
+			CorpSecret: os.Getenv(MessengerWeComCorpSecret),
+		},
+		Lark: Lark{
+			AppId:     os.Getenv(MessengerLarkAppId),
+			AppSecret: os.Getenv(MessageLarkAppSecret),
+		},
+	}
 
-    return
+	return
 }
 
 // FromConfiguration
@@ -92,23 +83,23 @@ func FromEnv() (err error) {
 // @param config config map
 // @return err
 func FromConfiguration(config map[string]interface{}) (err error) {
-    var (
-        conf []byte
-    )
+	var (
+		conf []byte
+	)
 
-    // map to json
-    if conf, err = json.Marshal(config); err != nil {
-        return
-    }
+	// map to json
+	if conf, err = json.Marshal(config); err != nil {
+		return
+	}
 
-    // json to struct
-    if err = json.Unmarshal(conf, &configuration); err != nil {
-        return
-    }
+	// json to struct
+	if err = json.Unmarshal(conf, &configuration); err != nil {
+		return
+	}
 
-    return
+	return
 }
 
 func GetConfig() Config {
-    return configuration
+	return configuration
 }

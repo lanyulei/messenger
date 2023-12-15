@@ -1,3 +1,5 @@
+config/settings.dev.json
+
 ### common template
 .git
 .idea
