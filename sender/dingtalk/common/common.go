@@ -1,7 +1,6 @@
 package common
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -25,31 +24,30 @@ var (
 // @return err
 func GetAccountToken() (at string, err error) {
 	var (
-		result []byte
+		result map[string]interface{}
 	)
 
 	if accessToken == nil || time.Now().Unix() > accessToken["expires_time"].(int64) {
+		if accessToken == nil {
+			accessToken = make(map[string]interface{})
+		}
+
 		err = gout.GET(dingtalk.GetAccessTokenURL).SetQuery(gout.H{
 			"appkey":    config.GetConfig().DingTalk.AppKey,
 			"appsecret": config.GetConfig().DingTalk.AppSecret,
-		}).BindBody(&result).Do()
+		}).BindJSON(&result).Do()
 		if err != nil {
 			err = fmt.Errorf("failed to get access token, err:%s", err.Error())
 			return
 		}
 
-		err = json.Unmarshal(result, &accessToken)
-		if err != nil {
-			err = fmt.Errorf("failed to get access token, err:%s", err.Error())
+		if errCode, ok := result["errcode"]; ok && int(errCode.(float64)) != 0 {
+			err = fmt.Errorf("failed to get dingtalk access token, err:%s", result["errmsg"].(string))
 			return
 		}
 
-		if errCode, ok := accessToken["errcode"]; ok && int(errCode.(float64)) != 0 {
-			err = fmt.Errorf("failed to get dingtalk access token, err:%s", accessToken["errmsg"].(string))
-			return
-		}
-
-		accessToken["expires_time"] = time.Now().Unix() + int64(accessToken["expires_in"].(float64))
+		accessToken["expires_time"] = time.Now().Unix() + int64(result["expires_in"].(float64))
+		accessToken["access_token"] = result["access_token"]
 	}
 
 	at = accessToken["access_token"].(string)

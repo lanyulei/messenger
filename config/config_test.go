@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -36,6 +35,7 @@ func TestFromFile(t *testing.T) {
 			AppSecret: "test_dingtalk_app_secret",
 		},
 		WeCom: WeCom{
+			AgentId:    "test_wecom_agent_id",
 			CorpId:     "test_wecom_corp_id",
 			CorpSecret: "test_wecom_corp_secret",
 		},
@@ -50,7 +50,6 @@ func TestFromFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
-	fmt.Println(string(jsonData))
 	if _, err = tempFile.Write(jsonData); err != nil {
 		t.Fatalf("Failed to write to temporary config file: %v", err)
 	}
@@ -78,6 +77,7 @@ func TestFromEnv(t *testing.T) {
 	_ = os.Setenv(MessengerDingTalkAgentID, "test_dingtalk_agent_id")
 	_ = os.Setenv(MessengerDingTalkAppKey, "test_dingtalk_app_key")
 	_ = os.Setenv(MessengerDingTalkAppSecret, "test_dingtalk_app_secret")
+	_ = os.Setenv(MessengerWeComAgentId, "test_wecom_agent_id")
 	_ = os.Setenv(MessengerWeComCorpId, "test_wecom_corp_id")
 	_ = os.Setenv(MessengerWeComCorpSecret, "test_wecom_corp_secret")
 	_ = os.Setenv(MessengerLarkAppId, "test_lark_app_id")
@@ -109,6 +109,7 @@ func TestFromEnv(t *testing.T) {
 			AppSecret: "test_dingtalk_app_secret",
 		},
 		WeCom: WeCom{
+			AgentId:    "test_wecom_agent_id",
 			CorpId:     "test_wecom_corp_id",
 			CorpSecret: "test_wecom_corp_secret",
 		},
@@ -139,6 +140,7 @@ func TestFromConfiguration(t *testing.T) {
 			"app_secret": "test_dingtalk_app_secret",
 		},
 		"wecom": map[string]interface{}{
+			"agent_id":    "test_wecom_agent_id",
 			"corp_id":     "test_wecom_corp_id",
 			"corp_secret": "test_wecom_corp_secret",
 		},
@@ -169,6 +171,7 @@ func TestFromConfiguration(t *testing.T) {
 			AppSecret: "test_dingtalk_app_secret",
 		},
 		WeCom: WeCom{
+			AgentId:    "test_wecom_agent_id",
 			CorpId:     "test_wecom_corp_id",
 			CorpSecret: "test_wecom_corp_secret",
 		},

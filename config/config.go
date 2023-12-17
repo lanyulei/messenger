@@ -66,6 +66,7 @@ func FromEnv() (err error) {
 			AppSecret: os.Getenv(MessengerDingTalkAppSecret),
 		},
 		WeCom: WeCom{
+			AgentId:    os.Getenv(MessengerWeComAgentId),
 			CorpId:     os.Getenv(MessengerWeComCorpId),
 			CorpSecret: os.Getenv(MessengerWeComCorpSecret),
 		},

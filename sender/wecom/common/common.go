@@ -46,7 +46,7 @@ func GetAccountToken() (at string, err error) {
 			return
 		}
 
-		if int(result["errcode"].(float64)) != 0 {
+		if errCode, ok := result["errcode"]; ok && int(errCode.(float64)) != 0 {
 			err = fmt.Errorf("failed to get wecom access token, err:%s", result["errmsg"])
 			return
 		}

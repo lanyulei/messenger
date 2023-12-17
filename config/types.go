@@ -22,6 +22,7 @@ type DingTalk struct {
 }
 
 type WeCom struct {
+	AgentId    string `json:"agent_id"`    // agent id
 	CorpId     string `json:"corp_id"`     // corp id
 	CorpSecret string `json:"corp_secret"` // corp secret
 }
@@ -51,6 +52,7 @@ const (
 	MessengerDingTalkAppKey    = "MESSENGER_DINGTALK_APP_KEY"
 	MessengerDingTalkAppSecret = "MESSENGER_DINGTALK_APP_SECRET"
 
+	MessengerWeComAgentId    = "MESSENGER_WECOM_AGENT_ID"
 	MessengerWeComCorpId     = "MESSENGER_WECOM_CORP_ID"
 	MessengerWeComCorpSecret = "MESSENGER_WECOM_CORP_SECRET"
 
