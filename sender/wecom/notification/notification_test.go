@@ -27,6 +27,6 @@ func TestSend(t *testing.T) {
 		},
 	}
 
-	_, err = Send(msg)
+	_, err = Send([]string{}, msg)
 	assert.Nil(t, err)
 }

@@ -16,4 +16,10 @@ type Message struct {
 const (
 	MarkdownMessageType = "markdown"
 	TextMessageType     = "text"
+
+	Email    = "email"
+	DingTalk = "dingtalk"
+	Lark     = "lark"
+	WeCom    = "wecom"
+	Webhook  = "webhook"
 )

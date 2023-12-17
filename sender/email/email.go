@@ -1,12 +1,9 @@
 package email
 
 import (
-	"bytes"
 	"fmt"
-	"html/template"
 
 	"github.com/lanyulei/messenger/config"
-	"github.com/lanyulei/messenger/types"
 	"gopkg.in/gomail.v2"
 )
 
@@ -22,17 +19,7 @@ import (
 // @param title email title
 // @param content email content
 // @return err
-func Send(to, cc []string, title string, content *types.Message) (err error) {
-	var (
-		value string
-	)
-
-	value, err = formatContent(content)
-	if err != nil {
-		err = fmt.Errorf("format content failure, %s", err.Error())
-		return
-	}
-
+func Send(to, cc []string, title string, content string) (err error) {
 	m := gomail.NewMessage()
 
 	// sender
@@ -44,7 +31,7 @@ func Send(to, cc []string, title string, content *types.Message) (err error) {
 	// title
 	m.SetHeader("Subject", title)
 	// content
-	m.SetBody("text/html", value)
+	m.SetBody("text/html", content)
 	// attachment
 	//m.Attach("./myIpPic.png")
 
@@ -60,24 +47,5 @@ func Send(to, cc []string, title string, content *types.Message) (err error) {
 		err = fmt.Errorf("mail delivery failure, %s", err.Error())
 		return
 	}
-	return
-}
-
-func formatContent(message *types.Message) (content string, err error) {
-	var (
-		buf bytes.Buffer
-	)
-
-	tmpl, err := template.New("email").Parse(templateData)
-	if err != nil {
-		return
-	}
-
-	err = tmpl.Execute(&buf, message)
-	if err != nil {
-		return
-	}
-
-	content = buf.String()
 	return
 }

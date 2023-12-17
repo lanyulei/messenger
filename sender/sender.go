@@ -6,7 +6,6 @@ import (
 	larkNotification "github.com/lanyulei/messenger/sender/lark/notification"
 	"github.com/lanyulei/messenger/sender/webhook"
 	wecomNotification "github.com/lanyulei/messenger/sender/wecom/notification"
-	"github.com/lanyulei/messenger/types"
 )
 
 /*
@@ -15,11 +14,11 @@ import (
 */
 
 type Interface interface {
-	Email(to, cc []string, title string, content *types.Message) error
+	Email(to, cc []string, title string, content string) error
 	DingTalkNotify(content map[string]interface{}, userIdList, deptIdList string, toAllUser bool) (result string, err error)
-	WeComNotify(content map[string]interface{}) (result map[string]interface{}, err error)
+	WeComNotify(to []string, content map[string]interface{}) (result map[string]interface{}, err error)
 	LarkNotify(mobiles []string, content map[string]interface{}) (result map[string]interface{}, err error)
-	Webhook(content map[string]interface{}, webhook []string) error
+	Webhook(webhook []string, content map[string]interface{}) error
 }
 
 type sender struct{}
@@ -30,7 +29,7 @@ func New() Interface {
 
 // Email
 // @Description: send email notifications
-func (n *sender) Email(to, cc []string, title string, content *types.Message) (err error) {
+func (n *sender) Email(to, cc []string, title string, content string) (err error) {
 	return email.Send(to, cc, title, content)
 }
 
@@ -48,12 +47,12 @@ func (n *sender) LarkNotify(mobiles []string, content map[string]interface{}) (r
 
 // WeComNotify
 // @Description: send enterprise WeChat messages
-func (n *sender) WeComNotify(content map[string]interface{}) (result map[string]interface{}, err error) {
-	return wecomNotification.Send(content)
+func (n *sender) WeComNotify(to []string, content map[string]interface{}) (result map[string]interface{}, err error) {
+	return wecomNotification.Send(to, content)
 }
 
 // Webhook
 // @Description: send webhook notice
-func (n *sender) Webhook(content map[string]interface{}, webhookList []string) (err error) {
+func (n *sender) Webhook(webhookList []string, content map[string]interface{}) (err error) {
 	return webhook.Send(webhookList, content)
 }
