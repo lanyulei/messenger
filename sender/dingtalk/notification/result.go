@@ -3,6 +3,7 @@ package notification
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/lanyulei/messenger/config"
 	"github.com/lanyulei/messenger/sender/dingtalk"
 	"github.com/lanyulei/messenger/sender/dingtalk/common"
@@ -15,7 +16,7 @@ import (
   @Desc :
 */
 
-func GetResult(taskId int) (res []byte, err error) {
+func GetResult(taskId int) (resMap map[string]interface{}, err error) {
 	var (
 		data        []byte
 		accessToken string
@@ -41,10 +42,15 @@ func GetResult(taskId int) (res []byte, err error) {
 		SetHeader(gout.H{"Content-Type": "application/json"}).
 		SetQuery(gout.H{"access_token": accessToken}).
 		SetBody(data).
-		BindBody(&res).
+		BindJSON(&resMap).
 		Do()
 	if err != nil {
 		err = fmt.Errorf("failed to get notification details by task id, %s", err.Error())
+		return
+	}
+
+	if int(resMap["errcode"].(float64)) != 0 {
+		err = fmt.Errorf("failed to get notification details by task id, %s", resMap["errmsg"].(string))
 		return
 	}
 

@@ -73,19 +73,19 @@ func GetDingtalkUserId(mobile string) (res dingtalk.UserIdResponse, err error) {
 		return
 	}
 
+	// requires qyapi_get_member_by_mobile permission
 	err = gout.POST(dingtalk.GetUserIdURL).
-		SetQuery(gout.H{
-			"access_token": at,
-		}).
-		SetHeader(gout.H{
-			"Accept": "application/json",
-		}).
-		SetJSON(gout.H{
-			"mobile": mobile,
-		}).
+		SetQuery(gout.H{"access_token": at}).
+		SetHeader(gout.H{"Accept": "application/json"}).
+		SetJSON(gout.H{"mobile": mobile}).
 		BindJSON(&res).Do()
 	if err != nil {
 		err = fmt.Errorf("failed to get user id, err:%s", err.Error())
+		return
+	}
+
+	if res.ErrCode != 0 {
+		err = fmt.Errorf("failed to get user id, err: %s", res.ErrMsg)
 		return
 	}
 

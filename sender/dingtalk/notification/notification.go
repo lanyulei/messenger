@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/guonaihong/gout"
 	"github.com/lanyulei/messenger/config"
 	"github.com/lanyulei/messenger/sender/dingtalk"
@@ -25,10 +26,10 @@ import (
 // @return err
 func Send(userIdList, deptIdList string, toAllUser bool, msg map[string]interface{}) (result string, err error) {
 	var (
-		data, res   []byte
-		respMap     map[string]interface{}
-		accessToken string
-		taskId      int
+		data, resValue []byte
+		respMap, res   map[string]interface{}
+		accessToken    string
+		taskId         int
 	)
 
 	accessToken, err = common.GetAccountToken()
@@ -67,16 +68,15 @@ func Send(userIdList, deptIdList string, toAllUser bool, msg map[string]interfac
 		SetHeader(gout.H{"Content-Type": "application/json"}).
 		SetQuery(gout.H{"access_token": accessToken}).
 		SetBody(data).
-		BindBody(&res).
+		BindJSON(&respMap).
 		Do()
 	if err != nil {
 		err = fmt.Errorf("send dingtalk work notification, %s", err.Error())
 		return
 	}
 
-	err = json.Unmarshal(res, &respMap)
-	if err != nil {
-		err = fmt.Errorf("json deserialization failed, %s", err.Error())
+	if int(respMap["errcode"].(float64)) != 0 {
+		err = fmt.Errorf("send dingtalk work notification failed, %s", respMap["errmsg"].(string))
 		return
 	}
 
@@ -87,9 +87,14 @@ func Send(userIdList, deptIdList string, toAllUser bool, msg map[string]interfac
 			err = fmt.Errorf("get dingtalk work notification result failed, %s, task id: %d", err.Error(), taskId)
 			return
 		}
-		result = fmt.Sprintf("job notification return results, task id %d, %s", taskId, string(res))
+		resValue, err = json.Marshal(res)
+		if err != nil {
+			err = fmt.Errorf("json serialization failed, %s", err.Error())
+			return
+		}
+		result = fmt.Sprintf("job notification return results, task id %d, %s", taskId, string(resValue))
 	} else {
-		err = fmt.Errorf("send dingtalk work notification failed, %s", string(res))
+		err = fmt.Errorf("send dingtalk work notification failed, %s", string(resValue))
 	}
 
 	return

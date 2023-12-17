@@ -20,10 +20,10 @@ var (
 	accessToken map[string]interface{}
 )
 
-// GetTenantAccountToken
+// GetLarkAccountToken
 // @Description: get lark tenant account token
 // @return err
-func GetTenantAccountToken() (at string, err error) {
+func GetLarkAccountToken() (at string, err error) {
 	var (
 		result map[string]interface{}
 	)
@@ -65,7 +65,7 @@ func GetLarkUserIDByMobiles(mobiles []string) (larkUserResponse map[string]inter
 		at string
 	)
 
-	at, err = GetTenantAccountToken()
+	at, err = GetLarkAccountToken()
 	if err != nil {
 		err = fmt.Errorf("failed to get lark account token, err:%s", err.Error())
 		return
@@ -79,6 +79,11 @@ func GetLarkUserIDByMobiles(mobiles []string) (larkUserResponse map[string]inter
 		Do()
 	if err != nil {
 		err = fmt.Errorf("failed to get lark user id by mobiles, err:%s", err.Error())
+		return
+	}
+
+	if int(larkUserResponse["code"].(float64)) != 0 {
+		err = fmt.Errorf("failed to get lark user id by mobiles, err:%s", larkUserResponse["msg"].(string))
 		return
 	}
 

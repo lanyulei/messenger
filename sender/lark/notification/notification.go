@@ -2,6 +2,7 @@ package notification
 
 import (
 	"fmt"
+
 	"github.com/guonaihong/gout"
 	"github.com/lanyulei/messenger/sender/lark"
 	"github.com/lanyulei/messenger/sender/lark/common"
@@ -26,7 +27,7 @@ func Send(mobiles []string, content map[string]interface{}) (result map[string]i
 	)
 
 	// get account token
-	accessToken, err = common.GetTenantAccountToken()
+	accessToken, err = common.GetLarkAccountToken()
 	if err != nil {
 		err = fmt.Errorf("get account token failed, %s", err.Error())
 		return
