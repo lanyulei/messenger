@@ -19,7 +19,7 @@ func TestSend(t *testing.T) {
 
 	mobiles := []string{"188xxxxxxxx"}
 
-	_, err = Send(mobiles, map[string]interface{}{
+	_, err = New(mobiles).Send(map[string]interface{}{
 		"config": map[string]interface{}{
 			"wide_screen_mode": true,
 		},
