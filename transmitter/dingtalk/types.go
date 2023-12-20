@@ -10,6 +10,13 @@ const (
 	NotifyResultURL   = "https://oapi.dingtalk.com/topapi/message/corpconversation/getsendresult"
 	GetAccessTokenURL = "https://oapi.dingtalk.com/gettoken"
 	GetUserIdURL      = "https://oapi.dingtalk.com/topapi/v2/user/getbymobile"
+
+	MsgTextType     = "text"
+	MsgImageType    = "image"
+	MsgVoiceType    = "voice"
+	MsgFileType     = "file"
+	MsgLinkType     = "link"
+	MsgMarkdownType = "markdown"
 )
 
 type UserIdResponse struct {

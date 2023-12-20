@@ -1,12 +1,10 @@
-package notification
+package dingtalk
 
 import (
 	"encoding/json"
 	"fmt"
 
 	"github.com/lanyulei/messenger/config"
-	"github.com/lanyulei/messenger/sender/dingtalk"
-	"github.com/lanyulei/messenger/sender/dingtalk/common"
 
 	"github.com/guonaihong/gout"
 )
@@ -18,11 +16,11 @@ import (
 
 func GetResult(taskId int) (resMap map[string]interface{}, err error) {
 	var (
-		data        []byte
-		accessToken string
+		data []byte
+		at   string
 	)
 
-	accessToken, err = common.GetAccountToken()
+	at, err = GetAccountToken()
 	if err != nil {
 		return
 	}
@@ -38,9 +36,9 @@ func GetResult(taskId int) (resMap map[string]interface{}, err error) {
 		return
 	}
 
-	err = gout.POST(dingtalk.NotifyResultURL).
+	err = gout.POST(NotifyResultURL).
 		SetHeader(gout.H{"Content-Type": "application/json"}).
-		SetQuery(gout.H{"access_token": accessToken}).
+		SetQuery(gout.H{"access_token": at}).
 		SetBody(data).
 		BindJSON(&resMap).
 		Do()

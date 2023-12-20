@@ -19,7 +19,11 @@ import (
 // @param title email title
 // @param content email content
 // @return err
-func Send(to, cc []string, title string, content string) (err error) {
+func Send(to, cc []string, title string, contentType, content string) (err error) {
+	if contentType == "" {
+		contentType = "text/html"
+	}
+
 	m := gomail.NewMessage()
 
 	// sender
@@ -31,7 +35,7 @@ func Send(to, cc []string, title string, content string) (err error) {
 	// title
 	m.SetHeader("Subject", title)
 	// content
-	m.SetBody("text/html", content)
+	m.SetBody(contentType, content)
 	// attachment
 	//m.Attach("./myIpPic.png")
 

@@ -1,4 +1,4 @@
-package common
+package dingtalk
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 
 	"github.com/guonaihong/gout"
 	"github.com/lanyulei/messenger/config"
-	"github.com/lanyulei/messenger/sender/dingtalk"
-	"github.com/lanyulei/messenger/types"
 )
 
 /*
@@ -32,7 +30,7 @@ func GetAccountToken() (at string, err error) {
 			accessToken = make(map[string]interface{})
 		}
 
-		err = gout.GET(dingtalk.GetAccessTokenURL).SetQuery(gout.H{
+		err = gout.GET(GetAccessTokenURL).SetQuery(gout.H{
 			"appkey":    config.GetConfig().DingTalk.AppKey,
 			"appsecret": config.GetConfig().DingTalk.AppSecret,
 		}).BindJSON(&result).Do()
@@ -60,7 +58,7 @@ func GetAccountToken() (at string, err error) {
 // @param mobile phone number
 // @return res return results
 // @return err error message
-func GetDingtalkUserId(mobile string) (res dingtalk.UserIdResponse, err error) {
+func GetDingtalkUserId(mobile string) (res UserIdResponse, err error) {
 	var (
 		at string
 	)
@@ -72,7 +70,7 @@ func GetDingtalkUserId(mobile string) (res dingtalk.UserIdResponse, err error) {
 	}
 
 	// requires qyapi_get_member_by_mobile permission
-	err = gout.POST(dingtalk.GetUserIdURL).
+	err = gout.POST(GetUserIdURL).
 		SetQuery(gout.H{"access_token": at}).
 		SetHeader(gout.H{"Accept": "application/json"}).
 		SetJSON(gout.H{"mobile": mobile}).
@@ -88,15 +86,4 @@ func GetDingtalkUserId(mobile string) (res dingtalk.UserIdResponse, err error) {
 	}
 
 	return
-}
-
-func FormatMarkdown(title string, message *types.Message) (res string) {
-	return fmt.Sprintf("### %s  \n  > 标题：%s  \n  > 优先级：%s  \n  > 申请人：%s  \n  > 申请时间：%s  \n  > 最近处理时间：%s",
-		title,
-		message.Title,
-		message.Priority,
-		message.Creator,
-		message.CreatedAt,
-		message.UpdatedAt,
-	)
 }

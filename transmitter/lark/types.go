@@ -10,5 +10,9 @@ const (
 	GetTenantAccountTokenURL  = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal"
 	GetLarkUserIDByMobilesURL = "https://open.feishu.cn/open-apis/contact/v3/users/batch_get_id"
 
-	CardMessageType = "interactive"
+	MessageCardType  = "interactive"
+	MessageTextType  = "text"
+	MessageImageType = "image"
+	MessagePostType  = "post"
+	MessageShareType = "share_chat"
 )

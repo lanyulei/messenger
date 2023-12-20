@@ -1,14 +1,11 @@
-package common
+package lark
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/lanyulei/messenger/config"
-	"github.com/lanyulei/messenger/sender/lark"
-	"github.com/lanyulei/messenger/types"
-
 	"github.com/guonaihong/gout"
+	"github.com/lanyulei/messenger/config"
 )
 
 /*
@@ -32,7 +29,7 @@ func GetLarkAccountToken() (at string, err error) {
 		if accessToken == nil {
 			accessToken = make(map[string]interface{})
 		}
-		err = gout.POST(lark.GetTenantAccountTokenURL).SetJSON(gout.H{
+		err = gout.POST(GetTenantAccountTokenURL).SetJSON(gout.H{
 			"app_id":     config.GetConfig().Lark.AppId,
 			"app_secret": config.GetConfig().Lark.AppSecret,
 		}).BindJSON(&result).Do()
@@ -71,7 +68,7 @@ func GetLarkUserIDByMobiles(mobiles []string) (larkUserResponse map[string]inter
 		return
 	}
 
-	err = gout.POST(lark.GetLarkUserIDByMobilesURL).
+	err = gout.POST(GetLarkUserIDByMobilesURL).
 		SetQuery(gout.H{"user_id_type": "user_id"}).
 		SetHeader(gout.H{"Content-Type": "application/json", "Authorization": "Bearer " + at}).
 		SetJSON(gout.H{"mobiles": mobiles}).
@@ -88,32 +85,4 @@ func GetLarkUserIDByMobiles(mobiles []string) (larkUserResponse map[string]inter
 	}
 
 	return
-}
-
-// CardMessageFormat
-// @Description: format card message
-// @param title
-// @param message
-// @return map[string]interface{}
-func CardMessageFormat(title string, message *types.Message) map[string]interface{} {
-	return map[string]interface{}{
-		"header": map[string]interface{}{
-			"title": map[string]interface{}{"content": title, "tag": "plain_text"},
-		},
-		"elements": []map[string]interface{}{
-			{
-				"tag": "div", "text": map[string]interface{}{
-					"content": fmt.Sprintf(
-						"标题: **%s**\n优先级: **%s**\n申请人: **%s**\n申请时间: **%s**\n最近处理时间: **%s**",
-						message.Title,
-						message.Priority,
-						message.Creator,
-						message.CreatedAt,
-						message.UpdatedAt,
-					),
-					"tag": "lark_md",
-				},
-			},
-		},
-	}
 }

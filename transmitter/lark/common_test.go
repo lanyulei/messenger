@@ -1,11 +1,10 @@
-package common
+package lark
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/lanyulei/messenger/config"
+	"github.com/stretchr/testify/assert"
 )
 
 /*

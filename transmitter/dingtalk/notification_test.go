@@ -1,13 +1,10 @@
-package notification
+package dingtalk
 
 import (
 	"testing"
 
-	"github.com/lanyulei/messenger/sender/dingtalk"
-
 	"github.com/lanyulei/messenger/config"
 
-	"github.com/lanyulei/messenger/sender/dingtalk/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +16,7 @@ import (
 func TestSend(t *testing.T) {
 	var (
 		err error
-		res dingtalk.UserIdResponse
+		res UserIdResponse
 	)
 
 	// This address is your own profile address
@@ -27,7 +24,7 @@ func TestSend(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Get user ID by mobile phone number
-	res, err = common.GetDingtalkUserId("188xxxxxxxx")
+	res, err = GetDingtalkUserId("188xxxxxxxx")
 	assert.Nil(t, err)
 
 	// Send notification
@@ -38,6 +35,6 @@ func TestSend(t *testing.T) {
 		},
 	}
 
-	_, err = Send(res.Result.UserID, "", false, msg)
+	_, err = New(res.Result.UserID, "", false).Send(msg)
 	assert.Nil(t, err)
 }
