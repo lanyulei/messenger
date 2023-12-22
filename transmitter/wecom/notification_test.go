@@ -1,4 +1,4 @@
-package notification
+package wecom
 
 import (
 	"testing"
@@ -27,6 +27,6 @@ func TestSend(t *testing.T) {
 		},
 	}
 
-	_, err = Send([]string{}, msg)
+	_, err = New().Send([]string{}, msg)
 	assert.Nil(t, err)
 }

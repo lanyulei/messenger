@@ -1,13 +1,10 @@
-package common
+package wecom
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/lanyulei/messenger/config"
-
-	"github.com/lanyulei/messenger/sender/wecom"
-	"github.com/lanyulei/messenger/types"
 
 	"github.com/guonaihong/gout"
 )
@@ -34,7 +31,7 @@ func GetAccountToken() (at string, err error) {
 			accessToken = make(map[string]interface{})
 		}
 
-		err = gout.GET(wecom.GetAccountTokenURL).
+		err = gout.GET(GetAccountTokenURL).
 			SetQuery(gout.H{
 				"corpid":     config.GetConfig().WeCom.CorpId,
 				"corpsecret": config.GetConfig().WeCom.CorpSecret,
@@ -72,7 +69,7 @@ func GetWeComUserId(mobile string) (result string, err error) {
 		return
 	}
 
-	err = gout.POST(wecom.GetUserIdURL).
+	err = gout.POST(GetUserIdURL).
 		SetHeader(gout.H{"Content-Type": "application/json"}).
 		SetQuery(gout.H{"access_token": at}).
 		SetJSON(map[string]interface{}{
@@ -92,20 +89,4 @@ func GetWeComUserId(mobile string) (result string, err error) {
 
 	result = req["userid"].(string)
 	return
-}
-
-func FormatMarkdown(title string, message *types.Message) (content string) {
-	return fmt.Sprintf(`### %s
-><font color="comment">标题:</font> %s
-><font color="comment">优先级:</font> %s
-><font color="comment">申请人:</font> %s
-><font color="comment">申请时间:</font> %s
-><font color="comment">最近处理时间:</font> %s`,
-		title,
-		message.Title,
-		message.Priority,
-		message.Creator,
-		message.CreatedAt,
-		message.UpdatedAt,
-	)
 }

@@ -61,9 +61,7 @@ func (h *handler) Send(msg map[string]interface{}) (result map[string]interface{
 		}
 	}
 
-	if _, ok := msg["user_ids"]; !ok {
-		msg["user_ids"] = []string{}
-	} else {
+	if _, ok := msg["user_ids"]; ok && msg["user_ids"] != nil && len(msg["user_ids"].([]string)) > 0 {
 		receiveIds = append(receiveIds, msg["user_ids"].([]string)...)
 	}
 
