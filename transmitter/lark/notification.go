@@ -15,8 +15,7 @@ type Interface interface {
 	Send(msg map[string]interface{}) (result map[string]interface{}, err error)
 	SendText(content string) (result map[string]interface{}, err error)
 	SendImage(mediaId string) (result map[string]interface{}, err error)
-	SendShareChat(mediaId, duration string) (result map[string]interface{}, err error)
-	SendInteractive(mediaId string) (result map[string]interface{}, err error)
+	SendShareChat(shareChatId string) (result map[string]interface{}, err error)
 }
 
 type handler struct {
@@ -30,7 +29,7 @@ func New(mobiles []string) Interface {
 }
 
 // Send notification
-// https://open.feishu.cn/document/server-docs/im-v1/message-content-description/create_json#7215e4f6
+// more ways to send, https://open.feishu.cn/document/server-docs/im-v1/batch_message/send-messages-in-batches
 func (h *handler) Send(msg map[string]interface{}) (result map[string]interface{}, err error) {
 	var (
 		at                  string
@@ -62,15 +61,17 @@ func (h *handler) Send(msg map[string]interface{}) (result map[string]interface{
 		}
 	}
 
-	data := map[string]interface{}{
-		"msg_type": MessageCardType,
-		"user_ids": receiveIds,
-		"card":     msg,
+	if _, ok := msg["user_ids"]; !ok {
+		msg["user_ids"] = []string{}
+	} else {
+		receiveIds = append(receiveIds, msg["user_ids"].([]string)...)
 	}
+
+	msg["user_ids"] = receiveIds
 
 	err = gout.POST(NotifyBaseURL).
 		SetHeader(gout.H{"Content-Type": "application/json", "Authorization": "Bearer " + at}).
-		SetJSON(data).
+		SetJSON(msg).
 		BindJSON(&result).
 		Do()
 	if err != nil {
@@ -87,21 +88,31 @@ func (h *handler) Send(msg map[string]interface{}) (result map[string]interface{
 }
 
 func (h *handler) SendText(content string) (result map[string]interface{}, err error) {
-	//TODO implement me
-	panic("implement me")
+	msg := map[string]interface{}{
+		"msg_type": MessageTextType,
+		"content": map[string]interface{}{
+			"text": content,
+		},
+	}
+	return h.Send(msg)
 }
 
 func (h *handler) SendImage(mediaId string) (result map[string]interface{}, err error) {
-	//TODO implement me
-	panic("implement me")
+	msg := map[string]interface{}{
+		"msg_type": MessageImageType,
+		"content": map[string]interface{}{
+			"image_key": mediaId,
+		},
+	}
+	return h.Send(msg)
 }
 
-func (h *handler) SendShareChat(mediaId, duration string) (result map[string]interface{}, err error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (h *handler) SendInteractive(mediaId string) (result map[string]interface{}, err error) {
-	//TODO implement me
-	panic("implement me")
+func (h *handler) SendShareChat(shareChatId string) (result map[string]interface{}, err error) {
+	msg := map[string]interface{}{
+		"msg_type": MessageShareType,
+		"content": map[string]interface{}{
+			"share_chat_id": shareChatId,
+		},
+	}
+	return h.Send(msg)
 }
