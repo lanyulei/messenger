@@ -26,12 +26,21 @@ type handler struct {
 	DuplicateCheckInterval int    // Indicates the time interval for repeated message checking. The default is 1800 s and the maximum is no more than 4 hours.
 }
 
-func New(toUser, toParty, toTag string, agentId int, options map[string]interface{}) Interface {
+func New(agentId int, options map[string]interface{}) Interface {
 	h := &handler{
-		ToUser:  toUser,
-		ToParty: toParty,
-		ToTag:   toTag,
 		AgentId: agentId,
+	}
+
+	if v, ok := options["touser"]; ok {
+		h.ToUser = v.(string)
+	}
+
+	if v, ok := options["toparty"]; ok {
+		h.ToParty = v.(string)
+	}
+
+	if v, ok := options["totag"]; ok {
+		h.ToTag = v.(string)
 	}
 
 	if v, ok := options["safe"]; ok {
@@ -48,6 +57,8 @@ func New(toUser, toParty, toTag string, agentId int, options map[string]interfac
 
 	if v, ok := options["duplicate_check_interval"]; ok {
 		h.DuplicateCheckInterval = v.(int)
+	} else {
+		h.DuplicateCheckInterval = 1800
 	}
 
 	return h
@@ -88,11 +99,25 @@ func (h *handler) Send(content map[string]interface{}) (result map[string]interf
 		}
 	}
 
-	content["agentid"] = h.AgentId
-	content["safe"] = h.Safe
-	content["enable_id_trans"] = h.EnableIdTrans
-	content["enable_duplicate_check"] = h.EnableDuplicateCheck
-	content["duplicate_check_interval"] = h.DuplicateCheckInterval
+	if _, ok := content["agentid"]; !ok {
+		content["agentid"] = h.AgentId
+	}
+
+	if _, ok := content["safe"]; !ok {
+		content["safe"] = h.Safe
+	}
+
+	if _, ok := content["enable_id_trans"]; !ok {
+		content["enable_id_trans"] = h.EnableIdTrans
+	}
+
+	if _, ok := content["enable_duplicate_check"]; !ok {
+		content["enable_duplicate_check"] = h.EnableDuplicateCheck
+	}
+
+	if _, ok := content["duplicate_check_interval"]; !ok {
+		content["duplicate_check_interval"] = h.DuplicateCheckInterval
+	}
 
 	err = gout.POST(SendMessageURL).
 		SetHeader(gout.H{"Content-Type": "application/json"}).
@@ -113,7 +138,12 @@ func (h *handler) Send(content map[string]interface{}) (result map[string]interf
 	return
 }
 
-func (h *handler) SendText(to []string, content string) (result map[string]interface{}, err error) {
-	msg := map[string]interface{}{}
+func (h *handler) SendText(content string) (result map[string]interface{}, err error) {
+	msg := map[string]interface{}{
+		"msgtype": MessageTextType,
+		"text": map[string]interface{}{
+			"content": content,
+		},
+	}
 	return h.Send(msg)
 }
